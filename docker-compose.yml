@@ -1,0 +1,66 @@
+version: "3.9"
+services:
+  kafka:
+    image: bitnami/kafka:latest
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports: ["9092:9092"]
+
+  spark:
+    image: bitnami/spark:latest
+    environment:
+      SPARK_MODE: standalone
+    ports: ["8080:8080"]
+
+  feast:
+    image: feastdev/feast-te:latest
+    depends_on: [kafka]
+    command: feast-te
+    ports: ["6566:6566"]
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  ovms:
+    image: openvino/model_server:latest
+    command: --model_path /models/yolo --model_name yolo --port 9000
+    volumes:
+      - ./cv/model:/models/yolo
+    ports: ["9000:9000"]
+
+  api:
+    build: ./docker/api
+    env_file: .env
+    depends_on: [redis, ovms]
+    ports: ["${APP_PORT}:8000"]
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./infra/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports: ["9090:9090"]
+
+  grafana:
+    image: grafana/grafana:latest
+    ports: ["3001:3000"]
+    depends_on: [prometheus]
+    volumes:
+      - ./infra/grafana_datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./infra/grafana_dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
+      - ./infra/grafana_dashboard.json:/etc/grafana/provisioning/dashboards/tastetrailops.json
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+
+  frontend:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports: ["3000:3000"]
+    command: python3 server.py
+    depends_on: [api]

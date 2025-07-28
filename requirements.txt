@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-multipart
+Pillow
+opencv-python
+redis
+requests
+numpy
+tensorflow
+google-generativeai
+python-dotenv

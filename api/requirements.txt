@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+httpx
+python-multipart
+google-generativeai
+redis
+prometheus-fastapi-instrumentator
+pytest
+pytest-asyncio
+tensorflow>=2.13.0
+opencv-python
+numpy
+pillow
+python-dotenv

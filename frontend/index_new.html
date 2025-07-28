@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasteTrailOps - AI-Powered Food Discovery Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'display': ['Playfair Display', 'serif'],
+                    },
+                    animation: {
+                        'morph': 'morph 8s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'slideInUp': 'slideInUp 0.8s ease-out',
+                        'slideInRight': 'slideInRight 0.6s ease-out',
+                        'slideInLeft': 'slideInLeft 0.6s ease-out',
+                        'fadeInScale': 'fadeInScale 0.7s ease-out',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 2s ease-in-out infinite',
+                        'gradient-shift': 'gradient-shift 4s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(59, 130, 246, 0.5)',
+                        'glow-lg': '0 0 30px rgba(59, 130, 246, 0.4)',
+                        'morphic': '0 8px 32px rgba(0, 0, 0, 0.12)',
+                        'inner-glow': 'inset 0 2px 4px rgba(255, 255, 255, 0.1)',
+                    },
+                    backdropBlur: {
+                        'xs': '2px',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @keyframes morph {
+            0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+            to { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+        }
+
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .morphing-bg {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradient-shift 8s ease infinite;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+        
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        .dropdown-enter {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        
+        .dropdown-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+        
+        .tab-indicator {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .restaurant-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .restaurant-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" x-data="tasteTrailApp()">
+    <!-- Loading Screen -->
+    <div x-show="initialLoading" 
+         x-transition:leave="transition ease-in duration-500"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center morphing-bg">
+        <div class="text-center text-white">
+            <div class="w-20 h-20 mx-auto mb-4 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+            <h2 class="text-2xl font-bold mb-2">TasteTrailOps</h2>
+            <p class="text-lg opacity-90">Initializing AI Food Discovery<span class="loading-dots"></span></p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div x-show="!initialLoading" class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <!-- Navigation Header -->
+        <nav class="glass-morphism sticky top-0 z-40 border-b border-white/10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center animate-morph">
+                            <i class="fas fa-utensils text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-white">TasteTrailOps</h1>
+                            <p class="text-xs text-white/70">AI-Powered Food Discovery</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Location Selector -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" 
+                                    class="flex items-center space-x-2 px-4 py-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-all duration-200">
+                                <i class="fas fa-map-marker-alt text-red-400"></i>
+                                <span x-text="selectedLocation.name || 'Select Location'"></span>
+                                <i class="fas fa-chevron-down text-xs" :class="{ 'rotate-180': open }"></i>
+                            </button>
+                            
+                            <div x-show="open" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 scale-95"
+                                 x-transition:enter-end="opacity-100 scale-100"
+                                 @click.away="open = false"
+                                 class="absolute right-0 mt-2 w-64 glass-card rounded-xl shadow-lg z-50">
+                                <div class="p-2">
+                                    <input type="text" 
+                                           placeholder="Search locations..." 
+                                           x-model="locationSearch"
+                                           @input="searchLocations"
+                                           class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="max-h-48 overflow-y-auto">
+                                    <template x-for="location in filteredLocations" :key="location.id">
+                                        <button @click="selectLocation(location); open = false"
+                                                class="w-full text-left px-4 py-3 text-white hover:bg-white/10 transition-colors border-b border-white/5 last:border-b-0">
+                                            <div class="flex items-center space-x-3">
+                                                <i class="fas fa-map-marker-alt text-red-400"></i>
+                                                <div>
+                                                    <div class="font-medium" x-text="location.name"></div>
+                                                    <div class="text-xs text-white/70" x-text="location.country"></div>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- User Profile -->
+                        <div class="flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg">
+                            <div class="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <input type="text" 
+                                   x-model="userId" 
+                                   placeholder="User ID"
+                                   class="bg-transparent text-white placeholder-white/50 outline-none w-20 text-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <h1 class="text-5xl md:text-7xl font-display font-bold text-white mb-6 animate-slideInUp">
+                    Discover Your Next
+                    <span class="gradient-text block">Culinary Adventure</span>
+                </h1>
+                <p class="text-xl text-white/80 max-w-3xl mx-auto mb-8 animate-slideInUp" style="animation-delay: 0.2s;">
+                    Powered by advanced AI and computer vision, TasteTrailOps delivers personalized food recommendations that match your taste, location, and dietary preferences.
+                </p>
+            </div>
+
+            <!-- Advanced Controls Panel -->
+            <div class="glass-card rounded-2xl p-6 mb-8 animate-fadeInScale">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Meal Type Filter -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-white/80">Meal Type</label>
+                        <select x-model="filters.mealType" 
+                                class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Any Time</option>
+                            <option value="breakfast">Breakfast</option>
+                            <option value="lunch">Lunch</option>
+                            <option value="dinner">Dinner</option>
+                            <option value="snack">Snack</option>
+                            <option value="dessert">Dessert</option>
+                        </select>
+                    </div>
+
+                    <!-- Budget Range -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-white/80">Budget Range</label>
+                        <select x-model="filters.budget" 
+                                class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Any Budget</option>
+                            <option value="low">$ Budget-Friendly</option>
+                            <option value="medium">$$ Moderate</option>
+                            <option value="high">$$$ Premium</option>
+                            <option value="luxury">$$$$ Luxury</option>
+                        </select>
+                    </div>
+
+                    <!-- Cuisine Type -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-white/80">Cuisine Type</label>
+                        <select x-model="filters.cuisine" 
+                                class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Cuisines</option>
+                            <option value="italian">Italian</option>
+                            <option value="asian">Asian</option>
+                            <option value="mexican">Mexican</option>
+                            <option value="american">American</option>
+                            <option value="mediterranean">Mediterranean</option>
+                            <option value="indian">Indian</option>
+                        </select>
+                    </div>
+
+                    <!-- Distance -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-white/80">Distance</label>
+                        <select x-model="filters.distance" 
+                                class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Any Distance</option>
+                            <option value="1">Within 1 mile</option>
+                            <option value="5">Within 5 miles</option>
+                            <option value="10">Within 10 miles</option>
+                            <option value="25">Within 25 miles</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Tabs Navigation -->
+            <div class="flex space-x-1 mb-8 bg-white/10 rounded-xl p-1 relative">
+                <div class="tab-indicator absolute bg-white/20 rounded-lg transition-all duration-300 ease-in-out"
+                     :style="`width: ${100/4}%; transform: translateX(${['recommendations', 'analysis', 'preferences', 'insights'].indexOf(activeTab) * 100}%)`"></div>
+                
+                <button @click="switchTab('recommendations')"
+                        :class="activeTab === 'recommendations' ? 'text-white' : 'text-white/60'"
+                        class="relative z-10 flex-1 py-3 px-6 text-center font-medium rounded-lg transition-all duration-200">
+                    <i class="fas fa-star mr-2"></i>Recommendations
+                </button>
+                <button @click="switchTab('analysis')"
+                        :class="activeTab === 'analysis' ? 'text-white' : 'text-white/60'"
+                        class="relative z-10 flex-1 py-3 px-6 text-center font-medium rounded-lg transition-all duration-200">
+                    <i class="fas fa-camera mr-2"></i>Food Analysis
+                </button>
+                <button @click="switchTab('preferences')"
+                        :class="activeTab === 'preferences' ? 'text-white' : 'text-white/60'"
+                        class="relative z-10 flex-1 py-3 px-6 text-center font-medium rounded-lg transition-all duration-200">
+                    <i class="fas fa-heart mr-2"></i>Preferences
+                </button>
+                <button @click="switchTab('insights')"
+                        :class="activeTab === 'insights' ? 'text-white' : 'text-white/60'"
+                        class="relative z-10 flex-1 py-3 px-6 text-center font-medium rounded-lg transition-all duration-200">
+                    <i class="fas fa-chart-line mr-2"></i>Insights
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="min-h-96">
+                <!-- Recommendations Tab -->
+                <div x-show="activeTab === 'recommendations'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100">
+                    
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-white">Personalized Recommendations</h2>
+                        <button @click="getRecommendations()" 
+                                :disabled="loading || !userId"
+                                class="btn-primary text-white px-6 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+                            <i :class="loading ? 'fas fa-spinner animate-spin' : 'fas fa-search'" class="text-sm"></i>
+                            <span x-text="loading ? 'Discovering...' : 'Discover Food'"></span>
+                        </button>
+                    </div>
+
+                    <!-- Restaurant Cards Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-show="recommendations.length > 0">
+                        <template x-for="restaurant in recommendations" :key="restaurant.id">
+                            <div class="glass-card rounded-xl overflow-hidden restaurant-card">
+                                <div class="relative h-48 bg-gradient-to-br from-purple-500 to-pink-500">
+                                    <img :src="restaurant.image" :alt="restaurant.name" 
+                                         class="w-full h-full object-cover"
+                                         onerror="this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop'">
+                                    <div class="absolute top-3 right-3">
+                                        <span class="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-bold flex items-center">
+                                            <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                            <span x-text="restaurant.rating"></span>
+                                        </span>
+                                    </div>
+                                    <div class="absolute bottom-3 left-3">
+                                        <span class="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-lg text-xs font-medium"
+                                              x-text="restaurant.cuisine"></span>
+                                    </div>
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-lg font-bold text-white mb-2" x-text="restaurant.name"></h3>
+                                    <p class="text-white/70 text-sm mb-3" x-text="restaurant.description"></p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2 text-white/60 text-sm">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span x-text="restaurant.distance"></span>
+                                        </div>
+                                        <div class="flex items-center space-x-2 text-white/60 text-sm">
+                                            <i class="fas fa-clock"></i>
+                                            <span x-text="restaurant.time"></span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex space-x-2">
+                                        <button class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+                                            <i class="fas fa-phone mr-2"></i>Call
+                                        </button>
+                                        <button class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+                                            <i class="fas fa-directions mr-2"></i>Directions
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div x-show="!loading && recommendations.length === 0" class="text-center py-12">
+                        <div class="w-24 h-24 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center">
+                            <i class="fas fa-search text-white/50 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">No Recommendations Yet</h3>
+                        <p class="text-white/60 mb-6">Enter your User ID and click "Discover Food" to get personalized recommendations.</p>
+                    </div>
+                </div>
+
+                <!-- Food Analysis Tab -->
+                <div x-show="activeTab === 'analysis'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100">
+                    
+                    <h2 class="text-2xl font-bold text-white mb-6">AI Food Analysis</h2>
+                    
+                    <!-- Upload Area -->
+                    <div class="glass-card rounded-xl p-8 mb-6 text-center">
+                        <div class="border-2 border-dashed border-white/30 rounded-xl p-8 hover:border-white/50 transition-colors"
+                             @dragover.prevent 
+                             @drop.prevent="handleFileDrop($event)">
+                            <div x-show="!previewUrl" class="space-y-4">
+                                <div class="w-16 h-16 mx-auto bg-white/10 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-camera text-white/70 text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white mb-2">Upload Food Image</h3>
+                                    <p class="text-white/70 mb-4">Drag and drop an image or click to browse</p>
+                                    <input type="file" 
+                                           accept="image/*" 
+                                           @change="onFileSelect($event)" 
+                                           class="hidden" 
+                                           id="imageUpload">
+                                    <label for="imageUpload" 
+                                           class="inline-block bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg cursor-pointer transition-colors">
+                                        <i class="fas fa-upload mr-2"></i>Choose Image
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div x-show="previewUrl" class="space-y-4">
+                                <img :src="previewUrl" alt="Preview" class="max-w-full h-64 mx-auto rounded-lg object-cover">
+                                <div class="flex justify-center space-x-3">
+                                    <button @click="analyzeImage()" 
+                                            :disabled="loading"
+                                            class="btn-primary text-white px-6 py-3 rounded-lg font-medium disabled:opacity-50 flex items-center space-x-2">
+                                        <i :class="loading ? 'fas fa-spinner animate-spin' : 'fas fa-magic'" class="text-sm"></i>
+                                        <span x-text="loading ? 'Analyzing...' : 'Analyze Food'"></span>
+                                    </button>
+                                    <button @click="clearImage()" 
+                                            class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                                        <i class="fas fa-trash mr-2"></i>Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analysis Results -->
+                    <div x-show="analysisResult" class="space-y-6">
+                        <div class="glass-card rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                                <i class="fas fa-eye text-blue-400 mr-2"></i>
+                                Detected Foods
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <template x-for="food in analysisResult?.detected_foods || []" :key="food.food_item">
+                                    <div class="bg-white/5 rounded-lg p-4">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-bold text-white capitalize" x-text="food.food_item"></h4>
+                                            <span class="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded-full"
+                                                  x-text="Math.round(food.confidence * 100) + '%'"></span>
+                                        </div>
+                                        <p class="text-white/70 text-sm capitalize" x-text="food.category"></p>
+                                        <div x-show="food.nutritional_info" class="mt-2 text-xs text-white/60">
+                                            <span x-text="food.nutritional_info?.calories + ' cal'"></span> •
+                                            <span x-text="food.nutritional_info?.protein + 'g protein'"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-xl p-6" x-show="analysisResult?.recommendations">
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                                <i class="fas fa-lightbulb text-yellow-400 mr-2"></i>
+                                AI Recommendations
+                            </h3>
+                            <div class="space-y-2">
+                                <template x-for="recommendation in analysisResult?.recommendations || []">
+                                    <div class="flex items-start space-x-3 p-3 bg-white/5 rounded-lg">
+                                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                                        <p class="text-white/80" x-text="recommendation"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences Tab -->
+                <div x-show="activeTab === 'preferences'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100">
+                    
+                    <h2 class="text-2xl font-bold text-white mb-6">Taste Preferences</h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Dietary Restrictions -->
+                        <div class="glass-card rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                                <i class="fas fa-shield-alt text-red-400 mr-2"></i>
+                                Dietary Restrictions
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <template x-for="restriction in ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'keto', 'paleo', 'low-carb']">
+                                    <button @click="togglePreference('dietary_restrictions', restriction)"
+                                            :class="preferences.dietary_restrictions.includes(restriction) ? 'bg-red-500/20 border-red-400 text-red-300' : 'bg-white/5 border-white/20 text-white/70'"
+                                            class="p-3 rounded-lg border text-sm font-medium transition-all hover:scale-105">
+                                        <span x-text="restriction.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Cuisine Preferences -->
+                        <div class="glass-card rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                                <i class="fas fa-globe text-blue-400 mr-2"></i>
+                                Favorite Cuisines
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <template x-for="cuisine in ['italian', 'chinese', 'mexican', 'indian', 'japanese', 'thai', 'french', 'mediterranean']">
+                                    <button @click="togglePreference('cuisine_preferences', cuisine)"
+                                            :class="preferences.cuisine_preferences.includes(cuisine) ? 'bg-blue-500/20 border-blue-400 text-blue-300' : 'bg-white/5 border-white/20 text-white/70'"
+                                            class="p-3 rounded-lg border text-sm font-medium transition-all hover:scale-105">
+                                        <span x-text="cuisine.charAt(0).toUpperCase() + cuisine.slice(1)"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <button @click="savePreferences()" 
+                                :disabled="!userId || loading"
+                                class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i :class="loading ? 'fas fa-spinner animate-spin' : 'fas fa-save'" class="mr-2"></i>
+                            <span x-text="loading ? 'Saving...' : 'Save Preferences'"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Insights Tab -->
+                <div x-show="activeTab === 'insights'" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100">
+                    
+                    <h2 class="text-2xl font-bold text-white mb-6">Food Insights & Analytics</h2>
+                    
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="glass-card rounded-xl p-6 text-center">
+                            <div class="w-12 h-12 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-utensils text-blue-400 text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-1" x-text="stats.totalRecommendations"></h3>
+                            <p class="text-white/70">Total Recommendations</p>
+                        </div>
+                        <div class="glass-card rounded-xl p-6 text-center">
+                            <div class="w-12 h-12 mx-auto mb-4 bg-green-500/20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-star text-green-400 text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-1" x-text="stats.avgRating"></h3>
+                            <p class="text-white/70">Average Rating</p>
+                        </div>
+                        <div class="glass-card rounded-xl p-6 text-center">
+                            <div class="w-12 h-12 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-images text-purple-400 text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-1" x-text="stats.imagesAnalyzed"></h3>
+                            <p class="text-white/70">Images Analyzed</p>
+                        </div>
+                    </div>
+
+                    <!-- Trending Section -->
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                            <i class="fas fa-fire text-orange-400 mr-2"></i>
+                            Trending Now
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <template x-for="trend in trendingData" :key="trend.name">
+                                <div class="flex items-center space-x-4 p-4 bg-white/5 rounded-lg">
+                                    <div class="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white font-bold" x-text="trend.rank"></span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-white" x-text="trend.name"></h4>
+                                        <p class="text-white/70 text-sm" x-text="trend.description"></p>
+                                    </div>
+                                    <div class="text-green-400 font-bold" x-text="'+' + trend.growth + '%'"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        function tasteTrailApp() {
+            return {
+                // Core State
+                initialLoading: true,
+                activeTab: 'recommendations',
+                loading: false,
+                userId: '',
+                
+                // Location State
+                selectedLocation: {},
+                locationSearch: '',
+                locations: [
+                    { id: 1, name: 'New York, NY', country: 'United States', lat: 40.7128, lng: -74.0060 },
+                    { id: 2, name: 'Los Angeles, CA', country: 'United States', lat: 34.0522, lng: -118.2437 },
+                    { id: 3, name: 'London', country: 'United Kingdom', lat: 51.5074, lng: -0.1278 },
+                    { id: 4, name: 'Paris', country: 'France', lat: 48.8566, lng: 2.3522 },
+                    { id: 5, name: 'Tokyo', country: 'Japan', lat: 35.6762, lng: 139.6503 },
+                    { id: 6, name: 'Mumbai', country: 'India', lat: 19.0760, lng: 72.8777 },
+                    { id: 7, name: 'San Francisco, CA', country: 'United States', lat: 37.7749, lng: -122.4194 },
+                    { id: 8, name: 'Sydney', country: 'Australia', lat: -33.8688, lng: 151.2093 },
+                ],
+                filteredLocations: [],
+                
+                // Filters
+                filters: {
+                    mealType: '',
+                    budget: '',
+                    cuisine: '',
+                    distance: ''
+                },
+                
+                // Data
+                recommendations: [],
+                analysisResult: null,
+                preferences: {
+                    dietary_restrictions: [],
+                    cuisine_preferences: []
+                },
+                
+                // Image Analysis
+                selectedFile: null,
+                previewUrl: null,
+                
+                // Stats & Analytics
+                stats: {
+                    totalRecommendations: 127,
+                    avgRating: 4.3,
+                    imagesAnalyzed: 89
+                },
+                
+                trendingData: [
+                    { rank: 1, name: 'Korean BBQ', description: 'Authentic Korean flavors', growth: 23 },
+                    { rank: 2, name: 'Plant-Based Burgers', description: 'Sustainable dining', growth: 18 },
+                    { rank: 3, name: 'Artisan Pizza', description: 'Craft Italian cuisine', growth: 15 },
+                    { rank: 4, name: 'Fusion Tacos', description: 'Creative Mexican fusion', growth: 12 }
+                ],
+
+                // Initialize
+                init() {
+                    this.filteredLocations = this.locations;
+                    
+                    // Simulate app loading
+                    setTimeout(() => {
+                        this.initialLoading = false;
+                    }, 2000);
+
+                    // Load user data from localStorage
+                    this.loadUserData();
+                },
+
+                // Location Management
+                searchLocations() {
+                    if (!this.locationSearch) {
+                        this.filteredLocations = this.locations;
+                        return;
+                    }
+                    
+                    const search = this.locationSearch.toLowerCase();
+                    this.filteredLocations = this.locations.filter(location => 
+                        location.name.toLowerCase().includes(search) ||
+                        location.country.toLowerCase().includes(search)
+                    );
+                },
+
+                selectLocation(location) {
+                    this.selectedLocation = location;
+                    this.locationSearch = '';
+                    this.filteredLocations = this.locations;
+                    this.showNotification(`Location set to ${location.name}`, 'success');
+                },
+
+                // Tab Management
+                switchTab(tab) {
+                    this.activeTab = tab;
+                },
+
+                // Recommendations
+                async getRecommendations() {
+                    if (!this.userId.trim()) {
+                        this.showNotification('Please enter a User ID first!', 'warning');
+                        return;
+                    }
+
+                    this.loading = true;
+                    
+                    try {
+                        // Simulate API call with realistic restaurants
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+                        
+                        this.recommendations = this.generateRealisticRestaurants();
+                        this.showNotification(`Found ${this.recommendations.length} great recommendations!`, 'success');
+                        
+                    } catch (error) {
+                        this.showNotification('Error fetching recommendations. Please try again!', 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                generateRealisticRestaurants() {
+                    const restaurants = [
+                        {
+                            id: 1,
+                            name: "Bella Vista Ristorante",
+                            cuisine: "Italian",
+                            rating: 4.6,
+                            description: "Authentic Italian cuisine with handmade pasta and wood-fired pizzas",
+                            distance: "0.8 mi",
+                            time: "25-35 min",
+                            image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop"
+                        },
+                        {
+                            id: 2,
+                            name: "Dragon Palace",
+                            cuisine: "Chinese",
+                            rating: 4.4,
+                            description: "Traditional Chinese dishes with modern presentation and fresh ingredients",
+                            distance: "1.2 mi",
+                            time: "20-30 min",
+                            image: "https://images.unsplash.com/photo-1563379091339-03246963d61a?w=400&h=300&fit=crop"
+                        },
+                        {
+                            id: 3,
+                            name: "The Green Garden",
+                            cuisine: "Healthy",
+                            rating: 4.7,
+                            description: "Farm-to-table dining with organic ingredients and creative vegetarian options",
+                            distance: "0.5 mi",
+                            time: "15-25 min",
+                            image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop"
+                        },
+                        {
+                            id: 4,
+                            name: "Sakura Sushi Bar",
+                            cuisine: "Japanese",
+                            rating: 4.8,
+                            description: "Fresh sushi and sashimi prepared by master chefs with premium ingredients",
+                            distance: "2.1 mi",
+                            time: "30-40 min",
+                            image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop"
+                        },
+                        {
+                            id: 5,
+                            name: "Spice Route",
+                            cuisine: "Indian",
+                            rating: 4.5,
+                            description: "Authentic Indian spices and flavors in a modern, elegant setting",
+                            distance: "1.7 mi",
+                            time: "25-35 min",
+                            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop"
+                        },
+                        {
+                            id: 6,
+                            name: "Taco Libre",
+                            cuisine: "Mexican",
+                            rating: 4.3,
+                            description: "Creative Mexican fusion with fresh ingredients and bold flavors",
+                            distance: "0.9 mi",
+                            time: "20-30 min",
+                            image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop"
+                        }
+                    ];
+
+                    // Filter based on user preferences and location
+                    return restaurants.slice(0, Math.floor(Math.random() * 3) + 3);
+                },
+
+                // Image Analysis
+                onFileSelect(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        this.selectedFile = file;
+                        this.previewUrl = URL.createObjectURL(file);
+                    }
+                },
+
+                handleFileDrop(event) {
+                    const files = event.dataTransfer.files;
+                    if (files.length > 0) {
+                        this.selectedFile = files[0];
+                        this.previewUrl = URL.createObjectURL(files[0]);
+                    }
+                },
+
+                clearImage() {
+                    this.selectedFile = null;
+                    this.previewUrl = null;
+                    this.analysisResult = null;
+                    document.getElementById('imageUpload').value = '';
+                },
+
+                async analyzeImage() {
+                    if (!this.selectedFile) {
+                        this.showNotification('Please select an image first!', 'warning');
+                        return;
+                    }
+
+                    this.loading = true;
+                    
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', this.selectedFile);
+
+                        const response = await fetch('http://localhost:8000/analyze-image', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        this.analysisResult = await response.json();
+                        this.showNotification('Image analysis completed successfully!', 'success');
+                        
+                    } catch (error) {
+                        console.error('Error analyzing image:', error);
+                        this.showNotification('Error analyzing image. Please try again!', 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                // Preferences
+                togglePreference(category, value) {
+                    const prefs = this.preferences[category];
+                    const index = prefs.indexOf(value);
+                    
+                    if (index > -1) {
+                        prefs.splice(index, 1);
+                    } else {
+                        prefs.push(value);
+                    }
+                },
+
+                async savePreferences() {
+                    if (!this.userId.trim()) {
+                        this.showNotification('Please enter a User ID first!', 'warning');
+                        return;
+                    }
+
+                    this.loading = true;
+                    
+                    try {
+                        const response = await fetch(`http://localhost:8000/preferences/${this.userId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(this.preferences)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        this.showNotification('Preferences saved successfully!', 'success');
+                        this.saveUserData();
+                        
+                    } catch (error) {
+                        console.error('Error saving preferences:', error);
+                        this.showNotification('Error saving preferences. Please try again!', 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                // Local Storage
+                saveUserData() {
+                    const userData = {
+                        userId: this.userId,
+                        selectedLocation: this.selectedLocation,
+                        preferences: this.preferences,
+                        filters: this.filters
+                    };
+                    localStorage.setItem('tasteTrailUserData', JSON.stringify(userData));
+                },
+
+                loadUserData() {
+                    const userData = localStorage.getItem('tasteTrailUserData');
+                    if (userData) {
+                        const data = JSON.parse(userData);
+                        this.userId = data.userId || '';
+                        this.selectedLocation = data.selectedLocation || {};
+                        this.preferences = data.preferences || { dietary_restrictions: [], cuisine_preferences: [] };
+                        this.filters = data.filters || { mealType: '', budget: '', cuisine: '', distance: '' };
+                    }
+                },
+
+                // Notifications
+                showNotification(message, type = 'info') {
+                    const notification = document.createElement('div');
+                    const icons = {
+                        success: 'fas fa-check-circle text-green-400',
+                        error: 'fas fa-exclamation-circle text-red-400',
+                        warning: 'fas fa-exclamation-triangle text-yellow-400',
+                        info: 'fas fa-info-circle text-blue-400'
+                    };
+                    
+                    const colors = {
+                        success: 'from-green-500/20 to-green-600/20 border-green-400/30',
+                        error: 'from-red-500/20 to-red-600/20 border-red-400/30',
+                        warning: 'from-yellow-500/20 to-yellow-600/20 border-yellow-400/30',
+                        info: 'from-blue-500/20 to-blue-600/20 border-blue-400/30'
+                    };
+                    
+                    notification.className = `bg-gradient-to-r ${colors[type]} backdrop-blur-lg border text-white px-6 py-4 rounded-xl shadow-lg animate-slideInRight flex items-center space-x-3 max-w-md`;
+                    notification.innerHTML = `
+                        <i class="${icons[type]} text-lg"></i>
+                        <span class="font-medium flex-1">${message}</span>
+                        <button onclick="this.parentElement.remove()" class="text-white/60 hover:text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    document.getElementById('notifications').appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.style.transform = 'translateX(100%)';
+                        setTimeout(() => notification.remove(), 300);
+                    }, 5000);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
