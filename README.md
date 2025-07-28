@@ -1,6 +1,7 @@
 # TasteTrailOps - neXtaste
 
  **AI-Powered Food Analysis System with Superhero-Grade Intelligence**
+<img width="2545" height="1320" alt="image" src="https://github.com/user-attachments/assets/35dad7ac-7560-43a5-9b68-effa08fb3a17" />
 
 A modern web application that combines advanced computer vision, Gemini AI, and Food-101 dataset analysis to deliver intelligent food recognition and nutritional insights with a stunning Pixar-style interface.
 
