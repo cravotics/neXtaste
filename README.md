@@ -80,13 +80,6 @@ cd TasteTrailOps
 └─────────────────────────────────────────────────────────┘
 ```
 
-##  User Interface
-
-###  Loading Experience
-- **Professional Animation**: Neon neXtaste logo with floating particles
-- **Smooth Transitions**: X morphs from loading to navigation
-- **Pixar-Style Effects**: Atmospheric lighting and blur outlines
-
 ###  Food Analysis Interface
 1. ** Upload Section**
    - Drag & drop file upload
@@ -102,6 +95,7 @@ cd TasteTrailOps
    - Cultural context and origin
    - Cooking tips and preparation methods
    - Health recommendations
+<img width="1569" height="1313" alt="image" src="https://github.com/user-attachments/assets/89fac0f1-01fa-4d9c-9553-a08b854c261b" />
 
 ##  Technology Stack
 
